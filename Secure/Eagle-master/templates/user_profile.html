@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>User Profile - EaglePro</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <header class="eaglepro-header">
+        <div class="header-container">
+            <div class="logo-section">
+                <div class="eaglepro-logo">
+                    <h1>EaglePro</h1>
+                    <div class="tagline">First American Financial Corporation</div>
+                </div>
+                <div class="environment-badge">DEMO</div>
+            </div>
+            <div class="user-nav">
+                <div class="user-info">
+                    <img src="{{ url_for('static', filename='images/' + current_user_avatar) }}" class="user-avatar" alt="Avatar">
+                    <div class="user-details">
+                        <div class="user-name">{{ username }}</div>
+                        <div class="user-role">User ID: {{ user_id }}</div>
+                    </div>
+                </div>
+                <a href="/dashboard" class="logout-btn">Back to Dashboard</a>
+            </div>
+        </div>
+    </header>
+
+    <div class="main-container">
+        <div class="security-alert" style="background: #dc3545;">
+            <div class="alert-header">
+                <div class="alert-icon">💉</div>
+                <div class="alert-title">SQL INJECTION VULNERABILITY ACTIVE</div>
+            </div>
+            <p>This profile page uses <strong>vulnerable SQL queries</strong> for demonstration.</p>
+        </div>
+
+        <div class="panel">
+            <div class="panel-header">
+                <div class="panel-title">👤 User Profile</div>
+            </div>
+            <div class="panel-content">
+                {% if profile_user %}
+                <div class="user-profile">
+                    <img src="{{ url_for('static', filename='images/' + profile_user.avatar) }}" 
+                         style="width: 100px; height: 100px; border-radius: 50%; border: 3px solid var(--first-american-blue);">
+                    <h2>{{ profile_user.full_name }}</h2>
+                    <div class="user-details">
+                        <p><strong>Username:</strong> {{ profile_user.username }}</p>
+                        <p><strong>User ID:</strong> {{ profile_user.id }}</p>
+                        <p><strong>Department:</strong> {{ profile_user.department }}</p>
+                        <p><strong>Position:</strong> {{ profile_user.position }}</p>
+                        <p><strong>Admin:</strong> {{ "Yes" if profile_user.is_admin else "No" }}</p>
+                    </div>
+                </div>
+                {% else %}
+                <p>User not found.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="injection-examples" style="margin-top: 20px; padding: 15px; background: #fff3cd;">
+            <h4>💉 SQL Injection Examples for Profile:</h4>
+            <code style="display: block; margin: 5px 0;">/profile/1 OR 1=1</code>
+            <code style="display: block; margin: 5px 0;">/profile/1 UNION SELECT 1,2,3,4,5,6,7</code>
+        </div>
+    </div>
+</body>
+</html>

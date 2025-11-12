@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin SQL Query - EaglePro</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .query-container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        .query-box {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .query-textarea {
+            width: 100%;
+            height: 150px;
+            padding: 15px;
+            font-family: 'Monaco', 'Consolas', 'Courier New', monospace;
+            font-size: 14px;
+            border: 2px solid #ff6b6b;
+            border-radius: 8px;
+            resize: vertical;
+        }
+        .results-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        .results-table th,
+        .results-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        .results-table th {
+            background: #f8f9fa;
+            font-weight: bold;
+        }
+        .danger-zone {
+            background: #ffeaa7;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+            border-left: 4px solid #fdcb6e;
+        }
+    </style>
+</head>
+<body>
+    <header class="eaglepro-header">
+        <div class="header-container">
+            <div class="logo-section">
+                <div class="eaglepro-logo">
+                    <h1>EaglePro</h1>
+                    <div class="tagline">First American Financial Corporation</div>
+                </div>
+                <div class="environment-badge">ADMIN</div>
+            </div>
+            <div class="user-nav">
+                <div class="user-info">
+                    <img src="{{ url_for('static', filename='images/' + current_user_avatar) }}" class="user-avatar" alt="Avatar">
+                    <div class="user-details">
+                        <div class="user-name">{{ username }}</div>
+                        <div class="user-role">Administrator</div>
+                    </div>
+                </div>
+                <a href="/dashboard" class="logout-btn">Back to Dashboard</a>
+            </div>
+        </div>
+    </header>
+
+    <div class="main-container">
+        <div class="query-container">
+            <!-- Extreme Warning -->
+            <div class="security-alert" style="background: #ff6b6b;">
+                <div class="alert-header">
+                    <div class="alert-icon">☢️</div>
+                    <div class="alert-title">EXTREME SECURITY RISK - DIRECT SQL EXECUTION</div>
+                </div>
+                <p>This interface allows <strong>direct SQL execution</strong>. Any SQL query will be executed directly on the database!</p>
+                <p><strong>⚠️ Use with extreme caution! Data loss may occur.</strong></p>
+            </div>
+
+            <!-- Query Interface -->
+            <div class="query-box">
+                <h2>⚡ Direct SQL Query Interface</h2>
+                <p>Execute any SQL query directly on the database (for demonstration only)</p>
+                
+                <form method="GET" action="/admin/query">
+                    <textarea name="sql" class="query-textarea" placeholder="Enter SQL query...">{{ sql_query }}</textarea>
+                    <button type="submit" class="btn" style="background: #ff6b6b; border-color: #ff6b6b; margin-top: 15px;">
+                        🚀 Execute SQL Query
+                    </button>
+                </form>
+
+                <!-- Error Display -->
+                {% if error %}
+                <div class="error-message" style="background: #dc3545; color: white; padding: 15px; border-radius: 8px; margin-top: 20px;">
+                    <strong>❌ Error:</strong> {{ error }}
+                </div>
+                {% endif %}
+
+                <!-- Results Display -->
+                {% if results %}
+                <div class="results-section" style="margin-top: 30px;">
+                    <h3>📊 Query Results ({{ results|length }} rows)</h3>
+                    
+                    <div style="overflow-x: auto;">
+                        <table class="results-table">
+                            <thead>
+                                <tr>
+                                    {% if results and results[0] %}
+                                        {% for key in results[0].keys() %}
+                                            <th>{{ key }}</th>
+                                        {% endfor %}
+                                    {% endif %}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for row in results %}
+                                <tr>
+                                    {% for value in row.values() %}
+                                        <td>{{ value }}</td>
+                                    {% endfor %}
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Example Queries -->
+            <div class="danger-zone">
+                <h3>📋 Example Queries (Use Carefully):</h3>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px;">
+                    <div>
+                        <h4>🔍 Read Operations:</h4>
+                        <code style="display: block; background: #f8f9fa; padding: 10px; margin: 5px 0; border-radius: 4px;">
+                            SELECT * FROM users
+                        </code>
+                        <code style="display: block; background: #f8f9fa; padding: 10px; margin: 5px 0; border-radius: 4px;">
+                            SELECT * FROM sqlite_master WHERE type='table'
+                        </code>
+                        <code style="display: block; background: #f8f9fa; padding: 10px; margin: 5px 0; border-radius: 4px;">
+                            SELECT * FROM documents LIMIT 10
+                        </code>
+                    </div>
+                    
+                    <div>
+                        <h4>✏️ Write Operations (Dangerous):</h4>
+                        <code style="display: block; background: #ff6b6b; color: white; padding: 10px; margin: 5px 0; border-radius: 4px;">
+                            UPDATE users SET is_admin=1 WHERE username='user1'
+                        </code>
+                        <code style="display: block; background: #ff6b6b; color: white; padding: 10px; margin: 5px 0; border-radius: 4px;">
+                            DELETE FROM documents WHERE id=1
+                        </code>
+                        <code style="display: block; background: #dc3545; color: white; padding: 10px; margin: 5px 0; border-radius: 4px;">
+                            DROP TABLE documents
+                        </code>
+                    </div>
+                </div>
+                
+                <p style="margin-top: 15px; font-size: 12px; color: #856404;">
+                    <strong>⚠️ CRITICAL WARNING:</strong> Write operations can permanently modify or delete data. 
+                    Always backup your database before testing destructive queries.
+                </p>
+            </div>
+
+            <!-- Quick Navigation -->
+            <div style="text-align: center; margin-top: 30px;">
+                <a href="/dashboard" class="btn btn-primary">← Back to Dashboard</a>
+                <a href="/admin/documents" class="btn" style="margin-left: 10px;">📋 Admin Documents</a>
+                <a href="/search" class="btn" style="margin-left: 10px; background: #dc3545;">💉 Vulnerable Search</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

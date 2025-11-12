@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Results - EaglePro</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <header class="eaglepro-header">
+        <div class="header-container">
+            <div class="logo-section">
+                <div class="eaglepro-logo">
+                    <h1>EaglePro</h1>
+                    <div class="tagline">First American Financial Corporation</div>
+                </div>
+                <div class="environment-badge">DEMO</div>
+            </div>
+            <div class="user-nav">
+                <div class="user-info">
+                    <img src="{{ url_for('static', filename='images/' + current_user_avatar) }}" class="user-avatar" alt="Avatar">
+                    <div class="user-details">
+                        <div class="user-name">{{ username }}</div>
+                        <div class="user-role">User ID: {{ user_id }}</div>
+                    </div>
+                </div>
+                <a href="/search" class="logout-btn">New Search</a>
+            </div>
+        </div>
+    </header>
+
+    <div class="main-container">
+        <!-- Security Alert -->
+        <div class="security-alert" style="background: #dc3545;">
+            <div class="alert-header">
+                <div class="alert-icon">💉</div>
+                <div class="alert-title">SQL INJECTION RESULTS</div>
+            </div>
+            <p>Search executed with: <code><strong>{{ search_term }}</strong></code></p>
+            <p>Found: <strong>{{ results|length }}</strong> results</p>
+        </div>
+
+        <!-- Search Results -->
+        <div class="panel">
+            <div class="panel-header">
+                <div class="panel-title">📄 Search Results</div>
+            </div>
+            <div class="panel-content">
+                {% if results %}
+                <div class="documents-list">
+                    {% for doc in results %}
+                    <div class="doc-item">
+                        <div class="doc-icon">
+                            {% if doc.doc_type == 'Research Paper' %}📚
+                            {% elif doc.doc_type == 'Security Report' %}🔒
+                            {% elif doc.doc_type == 'Financial Report' %}💰
+                            {% elif doc.doc_type == 'Technical Docs' %}⚙️
+                            {% else %}📄{% endif %}
+                        </div>
+                        <div class="doc-info">
+                            <div class="doc-title">{{ doc.title }}</div>
+                            <div class="doc-meta">
+                                <span class="doc-id">ID: {{ doc.id }}</span>
+                                <span class="doc-owner">User ID: {{ doc.user_id }}</span>
+                                <span class="doc-type">{{ doc.doc_type }}</span>
+                                {% if doc.sensitivity %}
+                                <span class="sensitivity-tag sensitivity-{{ doc.sensitivity|lower }}">
+                                    {{ doc.sensitivity }}
+                                </span>
+                                {% endif %}
+                            </div>
+                            {% if doc.content %}
+                            <div class="doc-preview">
+                                {{ doc.content[:200] }}{% if doc.content|length > 200 %}...{% endif %}
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="doc-actions">
+                            <a href="/document/{{ doc.id }}" class="btn btn-primary">View</a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div style="text-align: center; padding: 40px;">
+                    <div style="font-size: 48px; margin-bottom: 20px;">🔍</div>
+                    <h3>No results found</h3>
+                    <p>Try a different search term or try SQL Injection payloads.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Navigation -->
+        <div style="text-align: center; margin-top: 20px;">
+            <a href="/search" class="btn btn-primary">← Back to Search</a>
+            <a href="/dashboard" class="btn" style="margin-left: 10px;">🏠 Dashboard</a>
+        </div>
+    </div>
+    <!-- Thêm vào cuối file search.html -->
+    <script>
+        // Real-time SQL Injection detection (optional)
+        document.querySelector('form').addEventListener('submit', function (e) {
+            const searchInput = document.querySelector('input[name="q"]');
+            const suspiciousPatterns = [
+                'UNION SELECT', 'DROP TABLE', 'INSERT INTO',
+                'DELETE FROM', '--', ';', '/*', '*/'
+            ];
+
+            const input = searchInput.value.toUpperCase();
+            let detected = false;
+
+            suspiciousPatterns.forEach(pattern => {
+                if (input.includes(pattern.toUpperCase())) {
+                    detected = true;
+                }
+            });
+
+            if (detected) {
+                console.warn('%c⚠️ Potential SQL Injection detected before sending!',
+                    'color: orange; font-weight: bold; font-size: 14px;');
+            }
+        });
+    </script>
+</body>
+</html>

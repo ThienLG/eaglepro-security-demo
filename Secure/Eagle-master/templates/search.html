@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search - EaglePro</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .search-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .search-box {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .search-input {
+            width: 100%;
+            padding: 15px;
+            font-size: 16px;
+            border: 2px solid #dc3545;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+        .injection-examples {
+            background: #fff3cd;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        .injection-examples code {
+            display: block;
+            background: #f8f9fa;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 4px;
+            font-family: monospace;
+            border-left: 3px solid #dc3545;
+        }
+    </style>
+</head>
+<body>
+    <header class="eaglepro-header">
+        <div class="header-container">
+            <div class="logo-section">
+                <div class="eaglepro-logo">
+                    <h1>EaglePro</h1>
+                    <div class="tagline">First American Financial Corporation</div>
+                </div>
+                <div class="environment-badge">DEMO</div>
+            </div>
+            <div class="user-nav">
+                <div class="user-info">
+                    <img src="{{ url_for('static', filename='images/' + current_user_avatar) }}" class="user-avatar" alt="Avatar">
+                    <div class="user-details">
+                        <div class="user-name">{{ username }}</div>
+                        <div class="user-role">User ID: {{ user_id }}</div>
+                    </div>
+                </div>
+                <a href="/dashboard" class="logout-btn">Back to Dashboard</a>
+            </div>
+        </div>
+    </header>
+
+    <div class="main-container">
+        <div class="search-container">
+            <!-- Security Alert -->
+            <div class="security-alert" style="background: #dc3545;">
+                <div class="alert-header">
+                    <div class="alert-icon">💉</div>
+                    <div class="alert-title">SQL INJECTION VULNERABILITY ACTIVE</div>
+                </div>
+                <p>This search function contains <strong>SQL Injection vulnerabilities</strong> for demonstration purposes.</p>
+            </div>
+
+            <!-- Search Box -->
+            <div class="search-box">
+                <h2>🔍 Vulnerable Search</h2>
+                <p>Search through documents (with SQL Injection vulnerability)</p>
+                
+                <form method="GET" action="/search">
+                    <input type="text" name="q" class="search-input" placeholder="Enter search term..." 
+                           value="{{ request.args.get('q', '') }}">
+                    <button type="submit" class="btn btn-primary" style="background: #dc3545; border-color: #dc3545;">
+                        🔍 Search (Vulnerable)
+                    </button>
+                </form>
+
+                <!-- SQL Injection Examples -->
+                <div class="injection-examples">
+                    <h4>💉 SQL Injection Examples:</h4>
+                    <p>Try these payloads in the search box:</p>
+                    
+                    <code>test' OR '1'='1</code>
+                    <code>' UNION SELECT username, password, NULL, NULL, NULL, NULL, NULL FROM users--</code>
+                    <code>' UNION SELECT name, NULL, NULL, NULL, NULL, NULL, NULL FROM sqlite_master WHERE type='table'--</code>
+                    <code>'; DROP TABLE documents--</code>
+                    <code>' OR 1=1 UNION SELECT * FROM users--</code>
+                    
+                    <p style="margin-top: 15px; font-size: 14px; color: #856404;">
+                        <strong>⚠️ Warning:</strong> Some queries may modify or delete data. Use with caution.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Quick Links -->
+            <div style="text-align: center; margin-top: 20px;">
+                <a href="/dashboard" class="btn btn-primary">← Back to Dashboard</a>
+                {% if is_admin %}
+                <a href="/admin/query" class="btn" style="background: #ff6b6b; margin-left: 10px;">
+                    ⚡ Admin SQL Query
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</body>
+</html>
